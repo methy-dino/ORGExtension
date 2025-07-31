@@ -14,38 +14,119 @@ function arch_test(){
 }
 function enviar(){
 }
+function avisar_invalidez(container){
+		const texto = document.createElement("p");
+		texto.textContent = "ENTRADA INVÁLIDA";
+		texto.style.color = "red";
+		container.appendChild(texto);
+		const avisar = new Promise((resolver, rejeitar) => {
+			/* apaga o aviso de entrada inválida. */
+			setTimeout(() => {
+				texto.remove();
+			}, 3000);
+		});
+}
+function confirmar_evento() {
+	let valido = true;
+	const container = document.getElementById("CONTAINER_EVENTO");
+	const evento_dados = document.getElementById("EVENTO_DADOS");
+	const evento_nome = document.getElementById("EVENTO_NOME");
+	if (evento_nome.value == "" || evento_nome.value == null){
+		console.warn("NOME INVALIDO");
+		valido = false;
+	}
+	if (evento_dados.value == "" || evento_dados.value == null){
+		console.warn("DATA NULA");
+		valido = false;
+	} else if (new Date(evento_dados.value) < new Date()){
+		console.warn("DATA INVALIDA");
+		valido = false;
+	}
+	if (!valido){
+		avisar_invalidez(container);
+		return;
+	}
+	console.log("Criação de evento com sucesso\nNome do evento " + evento_nome.value + "\n" + "Hora de evento: " + evento_dados.value);
+	// TODO: escrever dados no dispositivo.
+}
+function confirmar_timer() {
+	let valido = true;
+	const container = document.getElementById("CONTAINER_TIMER");
+	const evento_dados = document.getElementById("TIMER_DADOS");
+	// TODO: verificar invalidez
+	/*if (evento_dados.value == "" || evento_dados.value == null){
+		console.warn("DATA NULA");
+		valido = false;
+	} else if (new Date(evento_dados.value) < new Date()){
+		console.warn("DATA INVALIDA");
+		valido = false;
+	}*/
+	if (!valido){
+		avisar_invalidez(container);
+		return;
+	}
+	console.log("Criação de timer com sucesso\nTempo de timer: " + evento_dados.value);
+	// TODO: escrever dados no dispositivo.
+}
 function pedir_evento(){
-	/* TODO: CONFERIR SE CONTAINER_EVENTO EXISTE */
+	{
+		let cont;
+		if ((cont = document.getElementById("CONTAINER_EVENTO")) != null){
+			cont.remove();
+			return;
+		}
+	}
 	const container_evento = document.createElement("div");
 	container_evento.id = "CONTAINER_EVENTO";
+	container_evento.className = "inserir";
+	/* -------------------------------------------- */
+	const evento_nome = document.createElement("input");
+	evento_nome.type = "text";
+	evento_nome.id = "EVENTO_NOME";
+	evento_nome.placeholder = "NOME";
+	evento_nome.className = "ent ent_txt";
+	container_evento.appendChild(evento_nome);
 	/* -------------------------------------------- */
 	const evento_dados = document.createElement("input");
-	evento_dados.type = "text";
+	evento_dados.type = "datetime-local";
 	evento_dados.id = "EVENTO_DADOS";
-	evento_dados.placeholder = "DD/MM/YYYY HH:MM";
+	var now = new Date();
+	now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+	evento_dados.value = now.toISOString().slice(0,16);
+	evento_dados.className = "ent ent_txt";
 	container_evento.appendChild(evento_dados);
 	/* -------------------------------------------- */
 	const evento_confirmar = document.createElement("button");
 	evento_confirmar.textContent = "criar";
-	evento_confirmar.id = "EVENTO_CONFIRMAR"
+	evento_confirmar.className = "ent ent_btn";
+	evento_confirmar.addEventListener("click", confirmar_evento);
 	/* -------------------------------------------- */
 	container_evento.appendChild(evento_confirmar);
 	EVENTO_BTN.after(container_evento);
 	console.log("INTERFACE DE EVENTO INICIALIZADA");
 }
 function pedir_timer(){
-	/* TODO: CONFERIR SE CONTAINER_TIMER EXISTE */
+	{
+		let cont;
+		if ((cont = document.getElementById("CONTAINER_TIMER")) != null){
+			cont.remove();
+			return;
+		}
+	}
 	const container_timer = document.createElement("div");
 	container_timer.id = "CONTAINER_TIMER";
+	container_timer.className = "inserir";
 	/* -------------------------------------------- */
 	const timer_dados = document.createElement("input");
 	timer_dados.type = "text";
 	timer_dados.id = "TIMER_DADOS";
 	timer_dados.placeholder = "HH:MM:SS";
+	timer_dados.className = "ent ent_txt";
 	container_timer.appendChild(timer_dados);
 	/* -------------------------------------------- */
 	const timer_confirmar = document.createElement("button");
 	timer_confirmar.textContent = "criar";
+	timer_confirmar.className = "ent ent_btn";
 	timer_confirmar.id = "TIMER_CONFIRMAR"
 	/* -------------------------------------------- */
 	container_timer.appendChild(timer_confirmar);

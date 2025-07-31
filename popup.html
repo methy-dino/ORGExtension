@@ -8,18 +8,22 @@
 			color: #ffffff;
 			text-align: center;
 			width: 200px;
+			height: max-content; /* para que não haja espaço 'em branco' ao fundo */
 		}
+
 		body {
 			padding: 0;
 			margin: 0;
-			height: auto; /* para que não haja espaço em branco ao fundo */
+			height: max-content; /* para que não haja espaço 'em branco' ao fundo */
 		}
+
 		.head {
 			width: 100%;
 			white-space: nowrap;
 			padding: 5% 0 5% 0;
 			margin: 0;
 		}
+
 		#linha {
 			align-self: center;
 			width: 95%;
@@ -27,18 +31,64 @@
 			background-color: white;
 			margin: 0 auto;
 		}
+
 		#novo {
 			width: 90%;
 		}
+
+		button {
+			cursor: pointer;
+		}
+		
 		.create {
 			width: 90%;
 			background-color: #333333;
 			border: solid;
 			border-width: 1;
-			border-color: #888888;
+			border-radius: 5px;
+			border-color: #a7a7a7;
 			margin: 0 0 10% 0; 
 			color: #ffffff;
 		}
+
+		.inserir {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		.ent {
+			border-radius: 5px;
+			margin: 0 0 5px 0; 
+		}
+
+		.ent_btn {
+			width: 33%;
+			background-color: #333333;
+			border: solid;
+			border-width: 1;
+			border-color: #a7a7a7;
+			margin: 0 0 10% 0; 
+			color: #ffffff;
+		}
+
+		.ent_txt {
+			width: 90%;
+			background-color: #444444;
+			border: solid;
+			border-color: #a7a7a7;
+			border-width: 1;
+			margin: 0 0 10% 0; 
+			color: #ffffff;
+		}
+		.ent_txt::placeholder {
+			font-weight: lighter;
+			color: #cecece;
+		}
+		p {
+			margin: 0 0 5 0;
+		}
+		/* TODO: fazer classe para o div dinamicamente inserido quando o botão é clicado */
 	</style>
 	</head>
 	<header></header>
@@ -46,6 +96,7 @@
 		<h1 class="head">🗓️ LEMBRETES</h1>
 		<div id="linha"></div>
 		<h1>EX 02.</h1>
+		<!-- TODO: criar template de evento / timer --!>
 		<h1>EX 03.</h1>
 		<button class="create" id="evento">Criar Novo</button>
 		<button class="create" id="timer">Configurar timer</button>
