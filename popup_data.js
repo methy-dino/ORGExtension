@@ -61,12 +61,31 @@ function confirmar_timer() {
 		console.warn("DATA INVALIDA");
 		valido = false;
 	}*/
+	let dois_pontos = 0;
+	for (const ch of evento_dados.value) {
+		 if (ch == ':'){
+			 dois_pontos++;
+		 } else if (ch > '9' || ch < '0'){
+			 valido = false;
+			 break;
+		 }
+	}
+	if (dois_pontos > 2){
+		valido = false;
+	}
 	if (!valido){
+		console.warn("TIMER INVALIDO");
 		avisar_invalidez(container);
 		return;
 	}
-	console.log("Criação de timer com sucesso\nTempo de timer: " + evento_dados.value);
-	// TODO: escrever dados no dispositivo.
+	let imprimir = "Criação de timer com sucesso\nTempo de timer: ";
+	let dividida = evento_dados.value.split(":");
+	const tempos = ["segundos", "minutos", "horas"];
+	for (let i = dividida.length-1; i > -1; i--){
+		imprimir += dividida[i] + " " + tempos[dividida.length-i-1] + " ";
+	}
+	console.log(imprimir);
+	// TODO: escrever dados no dispositivo. (assume-se que ultimo dado é segundos, penultimo minutos, antepenultimo horas
 }
 function pedir_evento(){
 	{
@@ -128,6 +147,7 @@ function pedir_timer(){
 	timer_confirmar.textContent = "criar";
 	timer_confirmar.className = "ent ent_btn";
 	timer_confirmar.id = "TIMER_CONFIRMAR"
+	timer_confirmar.addEventListener("click", confirmar_timer);
 	/* -------------------------------------------- */
 	container_timer.appendChild(timer_confirmar);
 	TIMER_BTN.after(container_timer);
