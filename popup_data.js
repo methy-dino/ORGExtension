@@ -4,10 +4,6 @@ const EVENTO_BTN = document.getElementById("evento");
 EVENTO_BTN.addEventListener("click", pedir_evento);
 const TIMER_BTN = document.getElementById("timer");
 TIMER_BTN.addEventListener("click", pedir_timer);
-/*const AJUDA_BTN = document.getElementById("ajuda");
-TIMER_BTN.addEventListener("click", pedir_ajuda);
- * decidir se AJUDA seria melhor integrada como botão ou como um link.
-*/
 
 function salvar(){
 	/* stub */
@@ -94,6 +90,21 @@ function confirmar_timer() {
 		imprimir += dividida[i] + " " + tempos[dividida.length-i-1] + " ";
 	}
 	const notif = criar_notificacao("Criado com êxito", "Seu timer foi criado", "icones/16x16.png");
+	let mensagem = {tipo: "TIMER"};
+	mensagem.segundos = Number(dividida[dividida.length-1]);
+	if (dividida.length > 1){
+		mensagem.minutos = Number(dividida[dividida.length-2]);
+	} else {
+		mensagem.minutos = 0; 
+	}
+	if (dividida.length > 2){
+		mensagem.horas = Number(dividida[dividida.length-2]);
+	} else {
+		mensagem.horas = 0; 
+	}
+		chrome.runtime.sendMessage(mensagem, (resposta) => {
+      console.log("Resposta recebida: ", resposta.dados);
+    });
 		const fecha = new Promise((resolver, rejeitar) => {
 			/* apaga a notificação */
 			setTimeout(() => {
@@ -101,7 +112,7 @@ function confirmar_timer() {
 			}, 3000);
 		});
 	console.log(imprimir);
-	// TODO: escrever dados no dispositivo. (assume-se que ultimo dado é segundos, penultimo minutos, antepenultimo horas
+	// TODO: chamar service worker (assume-se que ultimo dado é segundos, penultimo minutos, antepenultimo horas).
 }
 function pedir_evento(){
 	{
