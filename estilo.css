@@ -87,4 +87,11 @@ button:hover {
 }
 p {
 	margin: 0 0 5 0;
+	text-align: justify;
+}
+.ajuda {
+	margin: 0 0 0 5;
+	text-align: left;
+	color: #5381ff;
+	width: 100%;
 }

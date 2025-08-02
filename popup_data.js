@@ -4,6 +4,10 @@ const EVENTO_BTN = document.getElementById("evento");
 EVENTO_BTN.addEventListener("click", pedir_evento);
 const TIMER_BTN = document.getElementById("timer");
 TIMER_BTN.addEventListener("click", pedir_timer);
+/*const AJUDA_BTN = document.getElementById("ajuda");
+TIMER_BTN.addEventListener("click", pedir_ajuda);
+ * decidir se AJUDA seria melhor integrada como botão ou como um link.
+*/
 
 function salvar(){
 	/* stub */

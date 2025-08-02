@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "OrgExtension",
-  "description": "Agenda auxiliar integrada ao navegador",
+  "description": "Agenda auxiliar integrada ao navegador.\nPermitindo a criação de notificações após determinado tempo, ou em certa data.",
   "version": "0.0.1",
   "icons": {
     "16": "icones/16x16.png",
