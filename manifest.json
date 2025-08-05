@@ -1,34 +1,16 @@
 {
   "manifest_version": 3,
   "name": "OrgExtension",
-  "description": "Agenda auxiliar integrada ao navegador.\nPermitindo a criação de notificações após determinado tempo, ou em certa data.",
+  "description": "Agenda auxiliar integrada ao navegador.",
   "version": "0.0.1",
-  "icons": {
-    "16": "icones/16x16.png",
-    "32": "icones/32x32.png",
-    "48": "icones/48x48.png",
-    "128": "icones/128x128.png"
-  },
   "background": {
     "service_worker": "background.js",
-		"type": "module"
+    "type": "module"
   },
   "action": {
-		"default_popup":"popup.html",
-    "default_icon": {
-			"16": "icones/16x16.png",
-			"32": "icones/32x32.png",
-			"48": "icones/48x48.png",
-			"128": "icones/128x128.png"
-    }
+    "default_popup": "popup.html"
   },
-  "permissions": ["scripting", "notifications"],
-  "commands": {
-    "_execute_action": {
-      "suggested_key": {
-        "default": "Ctrl+B",
-        "mac": "Command+B"
-      }
-    }
-  }
+  "permissions": ["notifications", "storage", "alarms"]
 }
+
+//manifest temporário devido ao erro de uma imagem na hora de executar a estensão.
