@@ -13,4 +13,3 @@
   "permissions": ["notifications", "storage", "alarms"]
 }
 
-//manifest temporário devido ao erro de uma imagem na hora de executar a estensão.
