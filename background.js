@@ -18,7 +18,7 @@ chrome.runtime.onMessage.addListener(function(pedido, chamador, retorno) {
 function conferir_eventos(){
 	let agora = new Date();
 	if (agora >= timer && timer !== null){
-		let options = { body: "TEMPO ACABOU", icon: "icones/16x16.png"};
+		let options = { body: "TEMPO ACABOU", icon: "16x16.png"};
 		self.registration.showNotification('Extension Notification', options);
 		//criar_notificacao("TIMER", "TEMPO ACABOU", "icones/16x16.png");
 		timer = null;

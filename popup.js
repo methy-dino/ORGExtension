@@ -3,7 +3,7 @@ function gerarId() {
   return Date.now().toString();
 }
 
-// seleciona elementos
+// seleciona elementos do HTML
 const listEl = document.getElementById("linha");
 const input = document.getElementById("evento");
 const addBtn = document.getElementById("timer");

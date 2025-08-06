@@ -5,29 +5,128 @@ EVENTO_BTN.addEventListener("click", pedir_evento);
 const TIMER_BTN = document.getElementById("timer");
 TIMER_BTN.addEventListener("click", pedir_timer);
 
-function salvar(){
-	/* stub */
+// Gera um ID único baseado no timestamp atual
+function gerarId() {
+	return Date.now().toString();
 }
-function carregar(){
-	/* stub */
+
+// Salva um novo item (evento ou timer) no armazenamento local.
+   // Recupera a lista atual, Adiciona o novo item e Salva a lista atualiza.
+function salvar(item){
+	chrome.storage.local.get(["itens"], (res) => {
+		const lista = res.itens || [];
+		lista.push(item);
+		chrome.storage.local.set({ itens: lista });
+	});
+}
+
+// Carrega os itens do armazenamento local.
+   // Chama o callback com a lista de itens recuperados.
+function carregar(callback){
+	chrome.storage.local.get(["itens"], (res) => {
+		const lista = res.itens || [];
+		let agora = Date.now();
+		for(let i = 0; i < lista.length; i++){
+			if (lista[i].tipo === "evento") {
+				console.log(new Date(lista[i].dataHora) + " ");
+				if (new Date(lista[i].dataHora) < agora){
+					lista.splice(i, 1);
+					//console.log("removendo " + lista[i].dataHora);
+				}
+			} else if (lista[i].tipo === "timer") {
+			//if (!expirado){
+			//	return false;
+			//}
+			}
+		}
+		if (callback) callback(lista);
+	});
+}
+//Remove um item específico do armazenamentoo (em teste).
+chrome.storage.local.remove("nome_do_evento", function() {
+  console.log("Evento removido!");
+});
+
+// Testa e renderiza os itens salvos visualmente na tela.
+   // Cria ou atualiza o conteiner de exibição.
+   // Exibe os eventos e timers.
+function atualizar(elem){
+	carregar((lista) => {
+		let container = document.getElementById("DISPLAY_EVENTOS");
+		lista.push(elem);
+		if (!container) {
+			container = document.createElement("div");
+			container.id = "DISPLAY_EVENTOS";
+			container.style.marginTop = "12px";
+			const linha = document.getElementById("linha");
+			linha?.after(container);
+		}
+		container.replaceChildren(); // limpa antes de redesenhar
+		lista.forEach((item) => {
+			const div = document.createElement("div");
+			div.style.border = "1px solid #ccc";
+			div.style.padding = "6px";
+			div.style.marginBottom = "4px";
+			if (item.tipo === "evento") {
+				div.textContent = `📅 ${item.nome} em ${new Date(item.dataHora).toLocaleString("pt-BR")}`;
+			} else if (item.tipo === "timer") {
+				const { horas, minutos, segundos } = item.duracao;
+				div.textContent = `⏱️ Timer de ${horas}h ${minutos}m ${segundos}s`;
+			} else {
+				div.textContent = JSON.stringify(item);
+			}
+			container.appendChild(div);
+		});
+		chrome.storage.local.set({ itens: lista });
+	});
 }
 function arch_test(){
-	/* muda o DOM para testar a estrutura de compromissos */
-}
-function enviar(){
-}
-function avisar_invalidez(container){
-		const texto = document.createElement("p");
-		texto.textContent = "ENTRADA INVÁLIDA";
-		texto.style.color = "red";
-		container.appendChild(texto);
-		const avisar = new Promise((resolver, rejeitar) => {
-			/* apaga o aviso de entrada inválida. */
-			setTimeout(() => {
-				texto.remove();
-			}, 3000);
+	carregar((lista) => {
+		let container = document.getElementById("DISPLAY_EVENTOS");
+		if (!container) {
+			container = document.createElement("div");
+			container.id = "DISPLAY_EVENTOS";
+			container.style.marginTop = "12px";
+			const linha = document.getElementById("linha");
+			linha?.after(container);
+		}
+		container.replaceChildren(); // limpa antes de redesenhar
+		lista.forEach((item) => {
+			const div = document.createElement("div");
+			div.style.border = "1px solid #ccc";
+			div.style.padding = "6px";
+			div.style.marginBottom = "4px";
+			if (item.tipo === "evento") {
+				div.textContent = `📅 ${item.nome} em ${new Date(item.dataHora).toLocaleString("pt-BR")}`;
+			} else if (item.tipo === "timer") {
+				// TODO: mudar arquitetura timer para ter um 'item.final'
+				const { horas, minutos, segundos } = item.duracao;
+				div.textContent = `⏱️ Timer de ${horas}h ${minutos}m ${segundos}s`;
+			} else {
+				div.textContent = JSON.stringify(item);
+			}
+			container.appendChild(div);
 		});
+	});
 }
+
+function enviar(){
+	// placeholder, não alterado
+}
+
+function avisar_invalidez(container){
+	const texto = document.createElement("p");
+	texto.textContent = "ENTRADA INVÁLIDA";
+	texto.style.color = "red";
+	container.appendChild(texto);
+	const avisar = new Promise((resolver, rejeitar) => {
+		/* apaga o aviso de entrada inválida. */
+		setTimeout(() => {
+			texto.remove();
+		}, 3000);
+	});
+}
+
 function confirmar_evento() {
 	let valido = true;
 	const container = document.getElementById("CONTAINER_EVENTO");
@@ -49,71 +148,92 @@ function confirmar_evento() {
 		return;
 	}
 	console.log("Criação de evento com sucesso\nNome do evento " + evento_nome.value + "\n" + "Hora de evento: " + evento_dados.value);
+
+	const eventoObj = {
+		id: gerarId(),
+		tipo: "evento",
+		nome: evento_nome.value,
+		dataHora: evento_dados.value,
+		criadoEm: Date.now()
+	};
+
+	atualizar(eventoObj);
+
 	const notif = criar_notificacao("Criado com êxito", "Seu evento foi marcado", "icones/16x16.png");
-		const fecha = new Promise((resolver, rejeitar) => {
-			/* apaga a notificação */
-			setTimeout(() => {
-				notif.close();
-			}, 3000);
-		});
-		// TODO: escrever dados no dispositivo.
+	const fecha = new Promise((resolver, rejeitar) => {
+		/* apaga a notificação */
+		setTimeout(() => {
+			notif.close();
+		}, 3000);
+	});
 }
+
 function confirmar_timer() {
 	let valido = true;
 	const container = document.getElementById("CONTAINER_TIMER");
 	const evento_dados = document.getElementById("TIMER_DADOS");
-	// TODO: verificar invalidez
-	let dois_pontos = 0;
-	for (const ch of evento_dados.value) {
-		 if (ch == ':'){
-			 dois_pontos++;
-		 } else if (ch > '9' || ch < '0'){
-			 valido = false;
-			 break;
-		 }
+	// TODO: verificar invalidez (ajustado abaixo)
+	const raw = evento_dados.value.trim();
+	const partes = raw.split(":");
+	if (raw === "" || raw == null) valido = false;
+	if (partes.length > 3) valido = false;
+	for (const p of partes) {
+		if (!/^\d+$/.test(p)) {
+			valido = false;
+			break;
+		}
 	}
-	if (dois_pontos > 2){
-		valido = false;
-	}
-	if (evento_dados.value == "" || evento_dados.value == null){
-		valido = false;
-	} 
 	if (!valido){
 		console.warn("TIMER INVALIDO");
 		avisar_invalidez(container);
 		return;
 	}
+
 	let imprimir = "Criação de timer com sucesso\nTempo de timer: ";
-	let dividida = evento_dados.value.split(":");
-	const tempos = ["segundos", "minutos", "horas"];
-	for (let i = dividida.length-1; i > -1; i--){
-		imprimir += dividida[i] + " " + tempos[dividida.length-i-1] + " ";
+	let segundos = 0, minutos = 0, horas = 0;
+	if (partes.length === 1) {
+		segundos = Number(partes[0]);
+		imprimir += `${segundos} segundos `;
+	} else if (partes.length === 2) {
+		minutos = Number(partes[0]);
+		segundos = Number(partes[1]);
+		imprimir += `${minutos} minutos ${segundos} segundos `;
+	} else if (partes.length === 3) {
+		horas = Number(partes[0]);
+		minutos = Number(partes[1]);
+		segundos = Number(partes[2]);
+		imprimir += `${horas} horas ${minutos} minutos ${segundos} segundos `;
 	}
+
+	const timerObj = {
+		id: gerarId(),
+		tipo: "timer",
+		duracao: { horas, minutos, segundos },
+		agendadoEm: Date.now(),
+		expirado: false
+	};
+
+	atualizar(timerObj);
+
 	const notif = criar_notificacao("Criado com êxito", "Seu timer foi criado", "icones/16x16.png");
-	let mensagem = {tipo: "TIMER"};
-	mensagem.segundos = Number(dividida[dividida.length-1]);
-	if (dividida.length > 1){
-		mensagem.minutos = Number(dividida[dividida.length-2]);
-	} else {
-		mensagem.minutos = 0; 
-	}
-	if (dividida.length > 2){
-		mensagem.horas = Number(dividida[dividida.length-2]);
-	} else {
-		mensagem.horas = 0; 
-	}
-		chrome.runtime.sendMessage(mensagem, (resposta) => {
-      console.log("Resposta recebida: ", resposta.dados);
-    });
-		const fecha = new Promise((resolver, rejeitar) => {
-			/* apaga a notificação */
-			setTimeout(() => {
-				notif.close();
-			}, 3000);
-		});
+	let mensagem = { tipo: "TIMER" };
+	mensagem.segundos = segundos;
+	mensagem.minutos = minutos;
+	mensagem.horas = horas;
+
+	chrome.runtime.sendMessage(mensagem, (resposta) => {
+		console.log("Resposta recebida: ", resposta?.dados);
+	});
+
+	const fecha = new Promise((resolver, rejeitar) => {
+		/* apaga a notificação */
+		setTimeout(() => {
+			notif.close();
+		}, 3000);
+	});
 	console.log(imprimir);
-	// TODO: chamar service worker (assume-se que ultimo dado é segundos, penultimo minutos, antepenultimo horas).
 }
+
 function pedir_evento(){
 	{
 		let cont;
@@ -151,6 +271,7 @@ function pedir_evento(){
 	EVENTO_BTN.after(container_evento);
 	console.log("INTERFACE DE EVENTO INICIALIZADA");
 }
+
 function pedir_timer(){
 	{
 		let cont;
@@ -179,3 +300,6 @@ function pedir_timer(){
 	TIMER_BTN.after(container_timer);
 	console.log("INTERFACE DE TIMER INICIALIZADA");
 }
+
+// inicializa visualização já carregada
+arch_test();
