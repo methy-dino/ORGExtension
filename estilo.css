@@ -24,7 +24,7 @@ body {
 	width: 95%;
 	height: 1px;
 	background-color: white;
-	margin: 0 auto;
+	margin: 0 auto 10% auto;
 }
 
 #novo {
@@ -42,7 +42,7 @@ button {
 	border-width: 1;
 	border-radius: 5px;
 	border-color: #a7a7a7;
-	margin: 0 0 10% 0; 
+	margin: 0 0 10% 0;
 	color: #ffffff;
 }
 

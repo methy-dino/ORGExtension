@@ -4,25 +4,55 @@ import criar_notificacao from "./notificacoes.mjs";
  * timer: DATA
  * eventos: ARRAY DE DATAS (ORDEM DECRESCENTE)
  */
-let timer = null;
-let eventos = null;
-chrome.runtime.onMessage.addListener(function(pedido, chamador, retorno) {
-	if (pedido.tipo === "TIMER") {
-		let agora = new Date();
-		timer = new Date(agora.getTime() + (pedido.horas * 60 * 60 + pedido.minutos * 60 + pedido.segundos) * 1000);
-		retorno({ dados: timer });
-	} else if (pedido.tipo === "EVENTO"){
-		// TODO: INTERPRETAR DADOS.
+let eventos = [];
+function carregar(){
+	let reescrever = false;
+	chrome.storage.local.get(["itens"], (res) => {
+		eventos = res.itens || [];
+		let agora = Date.now();
+		for(let i = 0; i < eventos.length; i++){
+			if (eventos[i].tipo === "evento") {
+				//console.log(new Date(lista[i].dataHora) + " ");
+				if (new Date(eventos[i].dataHora) < agora){
+					reescrever = true;
+					eventos.splice(i, 1);
+					//console.log("removendo " + lista[i].dataHora);
+				}
+			} else if (eventos[i].tipo === "timer") {
+				if (eventos[i].fim < agora){
+					reescrever = true;
+					eventos.splice(i, 1);
+				}
+			}
+		}
+	});
+	if (reescrever){
+		chrome.storage.local.set({ itens: eventos});
 	}
+}
+chrome.runtime.onMessage.addListener(function(pedido, chamador, retorno) {
+	eventos.push(pedido);
+	retorno({ dados: "ok"});
 });
 function conferir_eventos(){
 	let agora = new Date();
-	if (agora >= timer && timer !== null){
-		let options = { body: "TEMPO ACABOU", icon: "16x16.png"};
-		self.registration.showNotification('Extension Notification', options);
-		//criar_notificacao("TIMER", "TEMPO ACABOU", "icones/16x16.png");
-		timer = null;
+	for (let i = 0; i < eventos.length; i++) {
+		if (eventos[i].tipo === "evento") {
+			if (new Date(eventos[i].dataHora) < agora){
+				console.log("EVENTO CONCLUIDO");
+				let options = { body: "TEMPO ACABOU", icon: "16x16.png"};
+				self.registration.showNotification('Extension Notification', options);
+				eventos.splice(i, 1);
+				//console.log("removendo " + lista[i].dataHora);
+			}
+		} else if (eventos[i].tipo === "timer") {
+			if (eventos[i].fim < agora){
+				let options = { body: "TEMPO ACABOU", icon: "16x16.png"};
+				self.registration.showNotification("Extension Notification", options);
+				eventos.splice(i, 1);
+			}
+		}
 	}
-	// TODO: terminar estrutura.
 }
 setInterval(conferir_eventos, 1000);
+carregar();
