@@ -24,30 +24,30 @@ function salvar(item){
    // Chama o callback com a lista de itens recuperados.
 function carregar(callback){
 	chrome.storage.local.get(["itens"], (res) => {
+		let reescrever = false;
 		const lista = res.itens || [];
 		let agora = Date.now();
-		for(let i = 0; i < lista.length; i++){
+		for(let i = lista.length-1; i > -1; i--){
 			if (lista[i].tipo === "evento") {
 				console.log(new Date(lista[i].dataHora) + " ");
 				if (new Date(lista[i].dataHora) < agora){
+					reescrever = true;
+					console.log("removendo evento chamado " + lista[i].nome);
 					lista.splice(i, 1);
-					//console.log("removendo " + lista[i].dataHora);
 				}
 			} else if (lista[i].tipo === "timer") {
 				console.log(lista[i].fim + "  " + agora);
-
 				if (lista[i].fim < agora){
+					reescrever = true;
+					console.log("removendo timer");
 					lista.splice(i, 1);
 				}
 			}
 		}
 		if (callback) callback(lista);
+		if (reescrever) chrome.storage.local.set({ itens: lista });
 	});
 }
-//Remove um item específico do armazenamentoo (em teste).
-chrome.storage.local.remove("nome_do_evento", function() {
-  console.log("Evento removido!");
-});
 
 // Testa e renderiza os itens salvos visualmente na tela.
    // Cria ou atualiza o conteiner de exibição.
@@ -149,6 +149,7 @@ function confirmar_evento() {
 		avisar_invalidez(container);
 		return;
 	}
+	container.remove();
 	console.log("Criação de evento com sucesso\nNome do evento " + evento_nome.value + "\n" + "Hora de evento: " + evento_dados.value);
 
 	const eventoObj = {
@@ -164,7 +165,8 @@ function confirmar_evento() {
 	chrome.runtime.sendMessage(mensagem, (resposta) => {
 		console.log("Resposta recebida: ", resposta?.dados);
 	});
-	const notif = criar_notificacao("Criado com êxito", "Seu evento foi marcado", "icones/16x16.png");
+
+	const notif = criar_notificacao("Criado com êxito", "Seu evento foi marcado", "icones/128x128.png");
 	const fecha = new Promise((resolver, rejeitar) => {
 		/* apaga a notificação */
 		setTimeout(() => {
@@ -177,7 +179,6 @@ function confirmar_timer() {
 	let valido = true;
 	const container = document.getElementById("CONTAINER_TIMER");
 	const evento_dados = document.getElementById("TIMER_DADOS");
-	// TODO: verificar invalidez (ajustado abaixo)
 	const raw = evento_dados.value.trim();
 	const partes = raw.split(":");
 	if (raw === "" || raw == null) valido = false;
@@ -193,7 +194,7 @@ function confirmar_timer() {
 		avisar_invalidez(container);
 		return;
 	}
-
+	container.remove();
 	let imprimir = "Criação de timer com sucesso\nTempo de timer: ";
 	let segundos = 0, minutos = 0, horas = 0;
 	if (partes.length === 1) {
@@ -219,7 +220,7 @@ function confirmar_timer() {
 	};
 	atualizar(timerObj);
 
-	const notif = criar_notificacao("Criado com êxito", "Seu timer foi criado", "icones/16x16.png");
+	const notif = criar_notificacao("Criado com êxito", "Seu timer foi criado", "icones/128x128.png");
 	let mensagem = timerObj;
 	chrome.runtime.sendMessage(mensagem, (resposta) => {
 		console.log("Resposta recebida: ", resposta?.dados);

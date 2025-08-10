@@ -1,5 +1,4 @@
 // CONFERIR SE ALGO MARCADO BATEU AGORA, OU 30 MINS ANTES DE ALGO
-import criar_notificacao from "./notificacoes.mjs";
 /* ESTRUTURA 
  * timer: DATA
  * eventos: ARRAY DE DATAS (ORDEM DECRESCENTE)
@@ -40,15 +39,15 @@ function conferir_eventos(){
 		if (eventos[i].tipo === "evento") {
 			if (new Date(eventos[i].dataHora) < agora){
 				console.log("EVENTO CONCLUIDO");
-				let options = { body: "TEMPO ACABOU", icon: "16x16.png"};
-				self.registration.showNotification('Extension Notification', options);
+				let options = { body: "TEMPO ACABOU", icon: "128x128.png"};
+				new Notification("TEMPO ACABOU", options);
 				eventos.splice(i, 1);
 				//console.log("removendo " + lista[i].dataHora);
 			}
 		} else if (eventos[i].tipo === "timer") {
 			if (eventos[i].fim < agora){
-				let options = { body: "TEMPO ACABOU", icon: "16x16.png"};
-				self.registration.showNotification("Extension Notification", options);
+				let options = { body: "TEMPO ACABOU", icon: "128x128.png"};
+				new Notification("TEMPO ACABOU", options);
 				eventos.splice(i, 1);
 			}
 		}
