@@ -40,14 +40,18 @@ function conferir_eventos(){
 			if (new Date(eventos[i].dataHora) < agora){
 				console.log("EVENTO CONCLUIDO");
 				let options = { body: "TEMPO ACABOU", icon: "128x128.png"};
+				let audio = new Audio(chrome.runtime.getURL("audios/alarm.wav"));
 				new Notification("TEMPO ACABOU", options);
+				audio.play();
 				eventos.splice(i, 1);
 				//console.log("removendo " + lista[i].dataHora);
 			}
 		} else if (eventos[i].tipo === "timer") {
 			if (eventos[i].fim < agora){
 				let options = { body: "TEMPO ACABOU", icon: "128x128.png"};
+				let audio = new Audio(chrome.runtime.getURL("audios/alarm.wav"));
 				new Notification("TEMPO ACABOU", options);
+				audio.play();
 				eventos.splice(i, 1);
 			}
 		}
