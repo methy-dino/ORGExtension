@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "OrgExtension",
   "description": "Agenda auxiliar integrada ao navegador.",
   "version": "0.0.1",
@@ -10,13 +10,23 @@
     "128": "icones/128x128.png"
 		},
   "background": {
-    "scripts": ["background.js"],
-    "type": "module",
-		"persistent": true
+    "service_worker": "background.js",
+    "type": "module"
   },
-	"browser_action": {
+	"action": {
 		"default_popup": "popup.html",
 		"default_title": "My Extension Popup"
 	},
+  "web_accessible_resources": [
+    {
+      "resources": ["icones/16x16.png",
+                   "icones/32x32.png",
+                   "icones/64x64.png",
+                   "icones/128x128.png",
+                   "audios/alarm.wav"
+                  ],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "permissions": ["notifications", "storage", "alarms"]
 }

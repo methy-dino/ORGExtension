@@ -49,6 +49,12 @@ function carregar(callback){
 	});
 }
 
+function deletar(alvo){
+	chrome.runtime.sendMessage({tipo: "remover", indice: alvo.indice}, (resposta) => {
+		console.log("Resposta recebida: ", resposta?.dados);
+	});
+	this.remove();
+}
 // Testa e renderiza os itens salvos visualmente na tela.
    // Cria ou atualiza o conteiner de exibição.
    // Exibe os eventos e timers.
@@ -64,21 +70,30 @@ function atualizar(elem){
 			linha?.after(container);
 		}
 		container.replaceChildren(); // limpa antes de redesenhar
-		lista.forEach((item) => {
+			for (let i = 0; i < lista.length; i++){
 			const div = document.createElement("div");
+			div.addEventListener('click', deletar);
+			div.indice = i;
 			div.style.border = "1px solid #ccc";
 			div.style.padding = "6px";
 			div.style.marginBottom = "4px";
-			if (item.tipo === "evento") {
-				div.textContent = `📅 ${item.nome} em ${new Date(item.dataHora).toLocaleString("pt-BR")}`;
-			} else if (item.tipo === "timer") {
-				const { horas, minutos, segundos } = item.duracao;
+			if (lista[i].tipo === "evento") {
+				div.textContent = `📅 ${lista[i].nome} em ${new Date(lista[i].dataHora).toLocaleString("pt-BR")}`;
+			} else if (lista[i].tipo === "timer") {
+				const { horas, minutos, segundos } = lista[i].duracao;
 				div.textContent = `⏱️ Timer de ${horas}h ${minutos}m ${segundos}s`;
 			} else {
-				div.textContent = JSON.stringify(item);
+				div.textContent = JSON.stringify(lista[i]);
 			}
 			container.appendChild(div);
-		});
+		}
+		const tooltip = document.createElement("p");
+		tooltip.textContent = "clique em um para deleta-lo";
+		tooltip.style.color = "gray";
+		tooltip.style.size = "0.5em";
+		tooltip.className = "tooltip";
+		container.appendChild(tooltip);
+		tooltip.style.alignSelf = "center";
 		chrome.storage.local.set({ itens: lista });
 	});
 }
@@ -93,27 +108,32 @@ function arch_test(){
 			linha?.after(container);
 		}
 		container.replaceChildren(); // limpa antes de redesenhar
-		lista.forEach((item) => {
+		for (let i = 0; i < lista.length; i++){
 			const div = document.createElement("div");
+			div.addEventListener('click', deletar);
+			div.indice = i;
 			div.style.border = "1px solid #ccc";
 			div.style.padding = "6px";
 			div.style.marginBottom = "4px";
-			if (item.tipo === "evento") {
-				div.textContent = `📅 ${item.nome} em ${new Date(item.dataHora).toLocaleString("pt-BR")}`;
-			} else if (item.tipo === "timer") {
-				// TODO: mudar arquitetura timer para ter um 'item.final'
-				const { horas, minutos, segundos } = item.duracao;
+			if (lista[i].tipo === "evento") {
+				div.textContent = `📅 ${lista[i].nome} em ${new Date(lista[i].dataHora).toLocaleString("pt-BR")}`;
+			} else if (lista[i].tipo === "timer") {
+				const { horas, minutos, segundos } = lista[i].duracao;
 				div.textContent = `⏱️ Timer de ${horas}h ${minutos}m ${segundos}s`;
 			} else {
-				div.textContent = JSON.stringify(item);
+				div.textContent = JSON.stringify(lista[i]);
 			}
 			container.appendChild(div);
-		});
+		}
+		const tooltip = document.createElement("p");
+		tooltip.textContent = "clique em um para deleta-lo";
+		tooltip.style.color = "gray";
+		tooltip.style.size = "0.5em";
+		tooltip.className = "tooltip";
+		container.appendChild(tooltip);
+		tooltip.style.alignSelf = "center";
+		chrome.storage.local.set({ itens: lista });
 	});
-}
-
-function enviar(){
-	// placeholder, não alterado
 }
 
 function avisar_invalidez(container){
@@ -161,7 +181,7 @@ function confirmar_evento() {
 	};
 
 	atualizar(eventoObj);
-	let mensagem = eventoObj;
+	let mensagem = {tipo: "adicionar", alvo: eventoObj};
 	chrome.runtime.sendMessage(mensagem, (resposta) => {
 		console.log("Resposta recebida: ", resposta?.dados);
 	});
@@ -221,7 +241,7 @@ function confirmar_timer() {
 	atualizar(timerObj);
 
 	const notif = criar_notificacao("Criado com êxito", "Seu timer foi criado", "icones/128x128.png");
-	let mensagem = timerObj;
+	let mensagem = {tipo: "adicionar", alvo: timerObj};
 	chrome.runtime.sendMessage(mensagem, (resposta) => {
 		console.log("Resposta recebida: ", resposta?.dados);
 	});
