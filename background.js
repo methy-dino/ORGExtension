@@ -40,7 +40,13 @@ chrome.runtime.onMessage.addListener(function(pedido, chamador, retorno) {
 		eventos.push(pedido.alvo);
 		console.log("adicionado");
 	} else {
-		eventos.splice(pedido.indice, 1);
+		for (let i = 0; i < eventos.length; i++) {
+			console.log(pedido.id + " " + eventos[i].id);
+			if (eventos[i].id == pedido.id){
+				eventos.splice(i, 1);
+				break;
+			}
+		}
 		console.log("removido");
 	}
 	retorno({ dados: "ok"});

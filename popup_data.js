@@ -50,7 +50,8 @@ function carregar(callback){
 }
 
 function deletar(alvo){
-	chrome.runtime.sendMessage({tipo: "remover", indice: alvo.indice}, (resposta) => {
+	console.log(alvo.i);
+	chrome.runtime.sendMessage({tipo: "remover", id: this.i}, (resposta) => {
 		console.log("Resposta recebida: ", resposta?.dados);
 	});
 	this.remove();
@@ -73,7 +74,8 @@ function atualizar(elem){
 			for (let i = 0; i < lista.length; i++){
 			const div = document.createElement("div");
 			div.addEventListener('click', deletar);
-			div.indice = i;
+			div.i = lista[i].id + "";
+			console.log(div.i);
 			div.style.border = "1px solid #ccc";
 			div.style.padding = "6px";
 			div.style.marginBottom = "4px";
@@ -111,7 +113,8 @@ function arch_test(){
 		for (let i = 0; i < lista.length; i++){
 			const div = document.createElement("div");
 			div.addEventListener('click', deletar);
-			div.indice = i;
+			div.i = lista[i].id + "";
+			console.log(div.i);
 			div.style.border = "1px solid #ccc";
 			div.style.padding = "6px";
 			div.style.marginBottom = "4px";
